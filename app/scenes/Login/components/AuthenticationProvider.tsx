@@ -8,6 +8,7 @@ import InputLarge from "~/components/InputLarge";
 import PluginIcon from "~/components/PluginIcon";
 import { client } from "~/utils/ApiClient";
 import Desktop from "~/utils/Desktop";
+import posthog from "~/utils/posthog";
 import { getRedirectUrl } from "~/utils/urls";
 import { PasskeyAuthenticationProvider } from "./PasskeyAuthenticationProvider";
 
@@ -44,6 +45,11 @@ function AuthenticationProvider(props: Props) {
       setSubmitting(true);
 
       try {
+        posthog.capture("email_login_requested", {
+          client_type: clientType,
+          prefer_otp: preferOTP,
+        });
+
         const response = await client.post(event.currentTarget.action, {
           email,
           client: clientType,
@@ -107,7 +113,13 @@ function AuthenticationProvider(props: Props) {
 
   return (
     <ButtonLarge
-      onClick={() => (window.location.href = href)}
+      onClick={() => {
+        posthog.capture("oauth_login_started", {
+          provider_id: id,
+          client_type: clientType,
+        });
+        window.location.href = href;
+      }}
       icon={<PluginIcon id={id} />}
       fullwidth
       {...rest}

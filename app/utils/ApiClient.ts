@@ -8,6 +8,7 @@ import { version } from "../../package.json";
 import env from "~/env";
 import Logger from "./Logger";
 import { download } from "./download";
+import posthog from "./posthog";
 import {
   AuthorizationError,
   BadGatewayError,
@@ -164,6 +165,16 @@ class ApiClient {
       pragma: "no-cache",
       ...options?.headers,
     };
+    const posthogDistinctId = posthog.get_distinct_id();
+    const posthogSessionId = posthog.get_session_id();
+
+    if (posthogDistinctId) {
+      headerOptions["X-POSTHOG-DISTINCT-ID"] = posthogDistinctId;
+    }
+
+    if (posthogSessionId) {
+      headerOptions["X-POSTHOG-SESSION-ID"] = posthogSessionId;
+    }
 
     // Mutating requests require a CSRF token, unless exempt server-side.
     const isModifyingRequest = method === "POST" || method === "PUT";

@@ -29,6 +29,7 @@ import useQuery from "~/hooks/useQuery";
 import useStores from "~/hooks/useStores";
 import type { PaginationParams, SearchResult } from "~/types";
 import { preventDefault } from "~/utils/events";
+import posthog from "~/utils/posthog";
 import { searchPath } from "~/utils/routeHelpers";
 import { decodeURIComponentSafe, isTruthyQueryValue } from "~/utils/urls";
 import CollectionFilter from "./components/CollectionFilter";
@@ -193,6 +194,22 @@ function Search() {
     }
 
     if (ev.key === "Enter") {
+      const submittedQuery = ev.currentTarget.value.trim();
+
+      if (submittedQuery) {
+        posthog.capture("search_submitted", {
+          has_collection_filter: !!collectionId,
+          has_document_filter: !!documentId,
+          has_user_filter: !!userId,
+          search_area: documentId
+            ? "document"
+            : collectionId
+              ? "collection"
+              : "workspace",
+          title_only: titleFilter,
+        });
+      }
+
       updateLocation(ev.currentTarget.value);
       return;
     }

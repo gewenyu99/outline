@@ -11,6 +11,7 @@ import PlaceholderDocument from "~/components/PlaceholderDocument";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import useQuery from "~/hooks/useQuery";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { documentEditPath, documentPath } from "~/utils/routeHelpers";
 
 function DocumentNew() {
@@ -65,13 +66,26 @@ function DocumentNew() {
             ?.addDocument(document, parentDocumentId);
         }
 
+        posthog.capture("document_created", {
+          has_collection: !!collection?.id,
+          has_parent_document: !!parentDocumentId,
+          has_template: !!query.get("templateId"),
+          publish: !!(collection?.id || parentDocumentId),
+        });
+
         history.replace(
           !user.separateEditMode
             ? documentPath(document)
             : documentEditPath(document),
           location.state
         );
-      } catch (_err) {
+      } catch (err) {
+        posthog.captureException(err);
+        posthog.capture("document_create_failed", {
+          has_collection: !!id,
+          has_parent_document: !!parentDocumentId,
+          has_template: !!query.get("templateId"),
+        });
         toast.error(t("Couldn’t create the document, try again?"));
         history.goBack();
       }

@@ -14,6 +14,7 @@ import Text from "~/components/Text";
 import useStores from "~/hooks/useStores";
 import useUserLocale from "~/hooks/useUserLocale";
 import { dateToExpiry } from "~/utils/date";
+import posthog from "~/utils/posthog";
 import ExpiryDatePicker from "./components/ExpiryDatePicker";
 import { ExpiryType, ExpiryValues, calculateExpiryDate } from "./utils";
 
@@ -79,6 +80,10 @@ function ApiKeyNew({ onSubmit }: Props) {
           expiresAt: expiresAt?.toISOString(),
           scope: scope ? scope.split(" ") : undefined,
         });
+        posthog.capture("api_key_created", {
+          has_custom_scope: !!scope,
+          expiry_type: expiryType,
+        });
         toast.success(
           t(
             "API key created. Please copy the value now as it will not be shown again."
@@ -86,12 +91,17 @@ function ApiKeyNew({ onSubmit }: Props) {
         );
         onSubmit();
       } catch (err) {
+        posthog.captureException(err);
+        posthog.capture("api_key_create_failed", {
+          has_custom_scope: !!scope,
+          expiry_type: expiryType,
+        });
         toast.error(errToString(err));
       } finally {
         setIsSaving(false);
       }
     },
-    [t, name, scope, expiresAt, onSubmit, apiKeys]
+    [t, name, scope, expiryType, expiresAt, onSubmit, apiKeys]
   );
 
   return (

@@ -1,3 +1,5 @@
+import posthog from "~/utils/posthog";
+
 /**
  * Helper class to track events across various analytics integrations
  */
@@ -26,5 +28,10 @@ export default class Analytics {
         ...metadata,
       });
     }
+
+    posthog.capture(event, {
+      action,
+      ...metadata,
+    });
   };
 }

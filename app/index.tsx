@@ -26,6 +26,7 @@ import Routes from "./routes";
 import Logger from "./utils/Logger";
 import { PluginManager } from "./utils/PluginManager";
 import history from "./utils/history";
+import { initPostHog } from "./utils/posthog";
 import { initSentry } from "./utils/sentry";
 import { ActionContextProvider } from "./hooks/useActionContext";
 
@@ -38,6 +39,8 @@ const element = window.document.getElementById("root");
 if (env.SENTRY_DSN) {
   initSentry(history);
 }
+
+initPostHog();
 
 configureMobx({
   // TODO: Enable these options and fix any resulting warnings
