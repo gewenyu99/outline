@@ -23,6 +23,7 @@ import type { Editor as SharedEditor } from "~/editor";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import useOnClickOutside from "~/hooks/useOnClickOutside";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { Bubble } from "./CommentThreadItem";
 import { HighlightedText } from "./HighlightText";
 import lazyWithRetry from "~/utils/lazyWithRetry";
@@ -137,7 +138,10 @@ function CommentForm({
         documentId,
         data: draft,
       })
-      .then(() => onSubmit?.())
+      .then(() => {
+        posthog.capture("comment_created", { comment_type: "comment" });
+        onSubmit?.();
+      })
       .catch(() => {
         onSaveDraft(commentDraft);
         setForceRender((s) => ++s);
@@ -210,7 +214,10 @@ function CommentForm({
 
     comment
       .save()
-      .then(() => onSubmit?.())
+      .then(() => {
+        posthog.capture("comment_created", { comment_type: "reply" });
+        onSubmit?.();
+      })
       .catch(() => {
         onSaveDraft(commentDraft);
         setForceRender((s) => ++s);

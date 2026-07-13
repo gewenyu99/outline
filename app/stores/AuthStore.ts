@@ -15,6 +15,7 @@ import { client } from "~/utils/ApiClient";
 import Desktop from "~/utils/Desktop";
 import { deleteAllDatabases } from "~/utils/developer";
 import Logger from "~/utils/Logger";
+import posthog from "~/utils/posthog";
 import isCloudHosted from "~/utils/isCloudHosted";
 import Store from "./base/Store";
 
@@ -223,6 +224,14 @@ export default class AuthStore extends Store<Team> {
         this.availableTeams = res.data.availableTeams;
         this.collaborationToken = res.data.collaborationToken;
 
+        posthog.identify(data.user.id, {
+          name: data.user.name,
+          role: data.user.role,
+        });
+        posthog.group("workspace", data.team.id, {
+          name: data.team.name,
+        });
+
         if (env.SENTRY_DSN) {
           const scope = Sentry.getCurrentScope();
           scope.setUser({ id: this.currentUserId! });
@@ -383,6 +392,7 @@ export default class AuthStore extends Store<Team> {
     }
 
     // clear all credentials from cache (and local storage via autorun)
+    posthog.reset();
     this.currentUserId = null;
     this.currentTeamId = null;
     this.collaborationToken = null;

@@ -11,6 +11,7 @@ import PlaceholderDocument from "~/components/PlaceholderDocument";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import useQuery from "~/hooks/useQuery";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { documentEditPath, documentPath } from "~/utils/routeHelpers";
 
 function DocumentNew() {
@@ -54,6 +55,12 @@ function DocumentNew() {
             index,
           }
         );
+
+        posthog.capture("document_created", {
+          creation_source: query.get("templateId") ? "template" : "blank",
+          is_child_document: !!parentDocumentId,
+          is_published: !!(collection?.id || parentDocumentId),
+        });
 
         if (parentDocumentId) {
           userMemberships

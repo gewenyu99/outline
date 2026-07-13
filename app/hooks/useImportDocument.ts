@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { errToString } from "@shared/utils/error";
 import { useSidebarContext } from "~/components/Sidebar/components/SidebarContext";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { documentPath } from "~/utils/routeHelpers";
 
 let importingLock = false;
@@ -53,6 +54,11 @@ export default function useImportDocument(
           try {
             const doc = await documents.import(file, documentId, cId, {
               publish: true,
+            });
+
+            posthog.capture("document_imported", {
+              file_type: file.type || "unknown",
+              import_destination: documentId ? "child_document" : "collection",
             });
 
             if (redirect) {
