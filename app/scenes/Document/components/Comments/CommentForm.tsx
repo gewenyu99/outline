@@ -28,6 +28,7 @@ import { HighlightedText } from "./HighlightText";
 import lazyWithRetry from "~/utils/lazyWithRetry";
 import { mergeRefs } from "react-merge-refs";
 import { HStack } from "~/components/primitives/HStack";
+import posthog from "~/utils/posthog";
 
 const CommentEditor = lazyWithRetry(() => import("./CommentEditor"));
 
@@ -137,7 +138,12 @@ function CommentForm({
         documentId,
         data: draft,
       })
-      .then(() => onSubmit?.())
+      .then(() => {
+        posthog.capture("comment_created", {
+          is_reply: false,
+        });
+        onSubmit?.();
+      })
       .catch(() => {
         onSaveDraft(commentDraft);
         setForceRender((s) => ++s);
@@ -210,7 +216,12 @@ function CommentForm({
 
     comment
       .save()
-      .then(() => onSubmit?.())
+      .then(() => {
+        posthog.capture("comment_created", {
+          is_reply: true,
+        });
+        onSubmit?.();
+      })
       .catch(() => {
         onSaveDraft(commentDraft);
         setForceRender((s) => ++s);

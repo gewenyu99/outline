@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Redirect } from "react-router-dom";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { changeLanguage } from "~/utils/language";
 import LoadingIndicator from "./LoadingIndicator";
 
@@ -17,6 +18,16 @@ const Authenticated = ({ children }: Props) => {
   const user = useCurrentUser({ rejectOnEmpty: false });
   const language = user?.language;
   const hasLoggedOut = useRef(false);
+
+  useEffect(() => {
+    if (auth.authenticated && user) {
+      posthog.identify(user.id, {
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      });
+    }
+  }, [auth.authenticated, user]);
 
   // Watching for language changes here as this is the earliest point we might have the user
   // available and means we can start loading translations faster

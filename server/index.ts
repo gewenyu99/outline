@@ -2,6 +2,7 @@
 /* oxlint-disable import/order */
 import { toError } from "@shared/utils/error";
 import env from "./env";
+import "./utils/posthog";
 
 import "./logging/tracer"; // must come before importing any instrumented module
 

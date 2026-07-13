@@ -10,6 +10,7 @@ import Logger from "@server/logging/Logger";
 import { Event, Collection, View } from "@server/models";
 import type { APIContext, AuthenticationResult } from "@server/types";
 import { AuthenticationType } from "@server/types";
+import posthog from "@server/utils/posthog";
 
 /**
  * Parse and return the details from the "sessions" cookie in the request, if
@@ -78,6 +79,15 @@ export async function signIn(
 
   // update the database when the user last signed in
   await user.updateSignedIn(ctx);
+
+  void posthog.capture({
+    distinctId: user.id,
+    event: "user_signed_in",
+    properties: {
+      auth_service: service,
+      team_id: team.id,
+    },
+  });
 
   await Event.createFromContext(
     ctx,

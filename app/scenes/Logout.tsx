@@ -1,11 +1,13 @@
 import { Redirect } from "react-router-dom";
 import env from "~/env";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { logoutPath } from "~/utils/routeHelpers";
 
 const Logout = () => {
   const { auth } = useStores();
 
+  posthog.reset();
   void auth.logout({
     userInitiated: true,
     clearCache: true,

@@ -10,6 +10,7 @@ import Input from "~/components/Input";
 import Notice from "~/components/Notice";
 import Text from "~/components/Text";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 
 type Props = {
   user: User;
@@ -30,6 +31,7 @@ function TeamNew({ user }: Props) {
         await auth.createTeam({
           name: name.trim(),
         });
+        posthog.capture("workspace_created");
       }
     } catch (err) {
       toast.error(errToString(err));

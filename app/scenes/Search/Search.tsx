@@ -41,6 +41,7 @@ import { SortInput } from "./components/SortInput";
 import UserFilter from "./components/UserFilter";
 import { HStack } from "~/components/primitives/HStack";
 import useMobile from "~/hooks/useMobile";
+import posthog from "~/utils/posthog";
 
 function Search() {
   const { t } = useTranslation();
@@ -145,6 +146,15 @@ function Search() {
   });
 
   const updateLocation = (query: string) => {
+    if (query.trim()) {
+      posthog.capture("search_performed", {
+        has_collection_filter: Boolean(collectionId),
+        has_document_filter: Boolean(documentId),
+        has_user_filter: Boolean(userId),
+        title_only: titleFilter,
+      });
+    }
+
     // If query came from route params, navigate to base search path
     const pathname = routeMatch.params.query ? searchPath() : location.pathname;
 
