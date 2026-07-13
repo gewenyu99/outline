@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/react";
+import posthog from "posthog-js";
 import invariant from "invariant";
 import { isNil } from "es-toolkit/compat";
 import { observable, action, computed, autorun, runInAction } from "mobx";
@@ -219,6 +220,10 @@ export default class AuthStore extends Store<Team> {
         data.groupUsers.map(this.rootStore.groupUsers.add);
         this.currentUserId = data.user.id;
         this.currentTeamId = data.team.id;
+        posthog.identify(data.user.id, {
+          email: data.user.email,
+          name: data.user.name,
+        });
 
         this.availableTeams = res.data.availableTeams;
         this.collaborationToken = res.data.collaborationToken;
@@ -381,6 +386,8 @@ export default class AuthStore extends Store<Team> {
       // clear IndexedDB databases used for document caching
       await deleteAllDatabases();
     }
+
+    posthog.reset();
 
     // clear all credentials from cache (and local storage via autorun)
     this.currentUserId = null;

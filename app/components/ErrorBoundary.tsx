@@ -1,4 +1,5 @@
 import { observable } from "mobx";
+import posthog from "posthog-js";
 import { observer } from "mobx-react";
 import * as React from "react";
 import type { TFunction } from "i18next";
@@ -53,6 +54,7 @@ class ErrorBoundaryClass extends React.Component<Props> {
 
   componentDidCatch(error: Error) {
     this.error = error;
+    posthog.captureException(error);
     this.trackError();
 
     if (

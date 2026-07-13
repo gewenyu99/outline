@@ -126,6 +126,8 @@ export enum MentionType {
 
 export type PublicEnv = {
   ROOT_SHARE_ID?: string;
+  POSTHOG_PROJECT_TOKEN?: string;
+  POSTHOG_HOST?: string;
   analytics: {
     service: IntegrationService;
     settings: IntegrationSettings<IntegrationType.Analytics>;

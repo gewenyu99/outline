@@ -512,6 +512,18 @@ export class Environment {
     environment.GOOGLE_ANALYTICS_ID
   );
 
+  /** PostHog project token for browser analytics. */
+  @Public
+  @IsOptional()
+  public POSTHOG_PROJECT_TOKEN = this.toOptionalString(
+    environment.POSTHOG_PROJECT_TOKEN
+  );
+
+  /** PostHog API host for browser analytics. */
+  @Public
+  @IsOptional()
+  public POSTHOG_HOST = this.toOptionalString(environment.POSTHOG_HOST);
+
   /**
    * A DataDog API key for tracking server metrics.
    */

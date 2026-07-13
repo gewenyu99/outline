@@ -1,6 +1,8 @@
 /**
  * Helper class to track events across various analytics integrations
  */
+import posthog from "posthog-js";
+
 export default class Analytics {
   /**
    * Send an event to Analytics
@@ -26,5 +28,10 @@ export default class Analytics {
         ...metadata,
       });
     }
+
+    posthog.capture(event, {
+      action_name: action,
+      ...metadata,
+    });
   };
 }
