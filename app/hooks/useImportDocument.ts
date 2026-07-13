@@ -7,6 +7,7 @@ import { errToString } from "@shared/utils/error";
 import { useSidebarContext } from "~/components/Sidebar/components/SidebarContext";
 import useStores from "~/hooks/useStores";
 import { documentPath } from "~/utils/routeHelpers";
+import posthog from "~/utils/posthog";
 
 let importingLock = false;
 
@@ -55,6 +56,12 @@ export default function useImportDocument(
               publish: true,
             });
 
+            posthog.capture("document_imported", {
+              file_type: file.type || "unknown",
+              has_collection: Boolean(cId),
+              has_parent_document: Boolean(documentId),
+            });
+
             if (redirect) {
               history.push({
                 pathname: documentPath(doc),
@@ -62,6 +69,7 @@ export default function useImportDocument(
               });
             }
           } catch (err) {
+            posthog.captureException(err, { operation: "document_import" });
             toast.error(errToString(err));
           } finally {
             toast.dismiss(toastId);

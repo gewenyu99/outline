@@ -5,6 +5,7 @@ import { Redirect } from "react-router-dom";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import useStores from "~/hooks/useStores";
 import { changeLanguage } from "~/utils/language";
+import posthog from "~/utils/posthog";
 import LoadingIndicator from "./LoadingIndicator";
 
 type Props = {
@@ -23,6 +24,16 @@ const Authenticated = ({ children }: Props) => {
   useEffect(() => {
     void changeLanguage(language, i18n);
   }, [i18n, language]);
+
+  useEffect(() => {
+    if (auth.authenticated && user) {
+      posthog.identify(user.id, {
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      });
+    }
+  }, [auth.authenticated, user]);
 
   const shouldLogout = !auth.authenticated && !auth.isFetching;
 

@@ -28,11 +28,20 @@ import { PluginManager } from "./utils/PluginManager";
 import history from "./utils/history";
 import { initSentry } from "./utils/sentry";
 import { ActionContextProvider } from "./hooks/useActionContext";
+import posthog from "./utils/posthog";
 
 // Load plugins as soon as possible
 void PluginManager.loadPlugins();
 
 initI18n(env.DEFAULT_LANGUAGE);
+
+if (import.meta.env.VITE_POSTHOG_KEY) {
+  posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
+    api_host: import.meta.env.VITE_POSTHOG_HOST,
+    defaults: "2026-05-30",
+  });
+}
+
 const element = window.document.getElementById("root");
 
 if (env.SENTRY_DSN) {

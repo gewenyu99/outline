@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { errToString } from "@shared/utils/error";
 import useStores from "~/hooks/useStores";
 import history from "~/utils/history";
+import posthog from "~/utils/posthog";
 import type { FormData } from "./CollectionForm";
 import { CollectionForm } from "./CollectionForm";
 
@@ -24,9 +25,13 @@ export const CollectionNew = observer(function CollectionNew_({
         runInAction(() => {
           collection.documents = [];
         });
+        posthog.capture("collection_created", {
+          has_description: Boolean(data.description),
+        });
         onSubmit?.();
         history.push(collection.path);
       } catch (error) {
+        posthog.captureException(error, { operation: "collection_create" });
         toast.error(errToString(error));
       }
     },

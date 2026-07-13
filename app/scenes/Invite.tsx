@@ -22,6 +22,7 @@ import useCurrentTeam from "~/hooks/useCurrentTeam";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import usePolicy from "~/hooks/usePolicy";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 
 type Props = {
   onSubmit: () => void;
@@ -60,6 +61,10 @@ function Invite({ onSubmit }: Props) {
         onSubmit();
 
         if (response.length > 0) {
+          posthog.capture("workspace_invites_sent", {
+            invite_count: response.length,
+            invited_role: role,
+          });
           toast.success(
             t("{{ count }} invites sent", { count: response.length })
           );
@@ -67,6 +72,7 @@ function Invite({ onSubmit }: Props) {
           toast.message(t("Those email addresses are already invited"));
         }
       } catch (err) {
+        posthog.captureException(err, { operation: "workspace_invite" });
         toast.error(errToString(err));
       } finally {
         setIsSaving(false);

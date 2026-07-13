@@ -11,6 +11,7 @@ import Text from "~/components/Text";
 import env from "~/env";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 
 type Props = {
   document: Document;
@@ -49,6 +50,12 @@ export const DocumentDownload = observer(({ document, onSubmit }: Props) => {
       includeChildDocuments,
     });
 
+    posthog.capture("document_export_started", {
+      export_format: contentType,
+      include_child_documents: includeChildDocuments,
+      has_child_documents: hasChildDocuments,
+    });
+
     if (includeChildDocuments && response?.data?.fileOperation) {
       const fileOperationId = response.data.fileOperation.id;
       const toastId = `export-${fileOperationId}`;
@@ -72,7 +79,15 @@ export const DocumentDownload = observer(({ document, onSubmit }: Props) => {
     }
 
     onSubmit();
-  }, [t, ui, document, contentType, includeChildDocuments, onSubmit]);
+  }, [
+    t,
+    ui,
+    document,
+    contentType,
+    includeChildDocuments,
+    hasChildDocuments,
+    onSubmit,
+  ]);
 
   const items = useMemo(() => {
     const radioItems = [

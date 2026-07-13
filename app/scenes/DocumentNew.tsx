@@ -12,6 +12,7 @@ import useCurrentUser from "~/hooks/useCurrentUser";
 import useQuery from "~/hooks/useQuery";
 import useStores from "~/hooks/useStores";
 import { documentEditPath, documentPath } from "~/utils/routeHelpers";
+import posthog from "~/utils/posthog";
 
 function DocumentNew() {
   const history = useHistory();
@@ -55,6 +56,13 @@ function DocumentNew() {
           }
         );
 
+        posthog.capture("document_created", {
+          has_collection: Boolean(collection?.id),
+          has_parent_document: Boolean(parentDocumentId),
+          is_published: Boolean(collection?.id || parentDocumentId),
+          created_from_template: Boolean(query.get("templateId")),
+        });
+
         if (parentDocumentId) {
           userMemberships
             .getByDocumentId(document.id)
@@ -71,7 +79,8 @@ function DocumentNew() {
             : documentEditPath(document),
           location.state
         );
-      } catch (_err) {
+      } catch (error) {
+        posthog.captureException(error, { operation: "document_create" });
         toast.error(t("Couldn’t create the document, try again?"));
         history.goBack();
       }
