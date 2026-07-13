@@ -3,6 +3,7 @@ import * as React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Client } from "@shared/types";
+import posthog from "posthog-js";
 import ButtonLarge from "~/components/ButtonLarge";
 import InputLarge from "~/components/InputLarge";
 import PluginIcon from "~/components/PluginIcon";
@@ -39,6 +40,7 @@ function AuthenticationProvider(props: Props) {
     event: React.SyntheticEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
+    posthog.capture("login_attempted", { provider: id });
 
     if (authState === "email" && email) {
       setSubmitting(true);

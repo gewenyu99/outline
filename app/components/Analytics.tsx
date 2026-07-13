@@ -4,6 +4,7 @@ import { escape } from "es-toolkit/compat";
 import * as React from "react";
 import type { PublicEnv } from "@shared/types";
 import { IntegrationService } from "@shared/types";
+import posthog from "posthog-js";
 import env from "~/env";
 
 type Props = {
@@ -12,6 +13,20 @@ type Props = {
 
 // TODO: Refactor this component to allow injection from plugins
 const Analytics: React.FC = ({ children }: Props) => {
+  React.useEffect(() => {
+    const key = import.meta.env.VITE_POSTHOG_KEY;
+    const host = import.meta.env.VITE_POSTHOG_HOST;
+
+    if (!key || !host) {
+      return;
+    }
+
+    posthog.init(key, {
+      api_host: host,
+      capture_pageview: true,
+    });
+  }, []);
+
   // Google Analytics 3
   React.useEffect(() => {
     if (!env.GOOGLE_ANALYTICS_ID?.startsWith("UA-")) {

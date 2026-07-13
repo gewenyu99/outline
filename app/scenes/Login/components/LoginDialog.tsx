@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import posthog from "posthog-js";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import styled from "styled-components";
@@ -16,6 +17,8 @@ export function LoginDialog() {
   const { t } = useTranslation();
 
   const handleSubmit = async (data: FormData) => {
+    posthog.capture("workspace_selection_submitted");
+
     try {
       await navigateToSubdomain(data.subdomain);
     } catch {
