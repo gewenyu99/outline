@@ -513,6 +513,16 @@ export class Environment {
   );
 
   /**
+   * PostHog project API key for server-side analytics capture.
+   */
+  public POSTHOG_API_KEY = this.toOptionalString(environment.POSTHOG_API_KEY);
+
+  /**
+   * PostHog host for server-side analytics capture.
+   */
+  public POSTHOG_HOST = this.toOptionalString(environment.POSTHOG_HOST);
+
+  /**
    * A DataDog API key for tracking server metrics.
    */
   public DD_API_KEY = environment.DD_API_KEY;

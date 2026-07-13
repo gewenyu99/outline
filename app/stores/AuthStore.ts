@@ -16,6 +16,7 @@ import Desktop from "~/utils/Desktop";
 import { deleteAllDatabases } from "~/utils/developer";
 import Logger from "~/utils/Logger";
 import isCloudHosted from "~/utils/isCloudHosted";
+import { identifyUser, resetPostHog } from "~/utils/posthog";
 import Store from "./base/Store";
 
 type PersistedData = Pick<
@@ -230,6 +231,15 @@ export default class AuthStore extends Store<Team> {
           scope.setExtra("teamId", this.currentTeamId);
         }
 
+        identifyUser({
+          id: data.user.id,
+          email: data.user.email,
+          name: data.user.name,
+          role: data.user.role,
+          teamId: data.team.id,
+          teamName: data.team.name,
+        });
+
         // Redirect to the correct custom domain or team subdomain if needed
         // Occurs when the (sub)domain is changed in admin and the user hits an old url
         const { hostname, pathname } = window.location;
@@ -381,6 +391,8 @@ export default class AuthStore extends Store<Team> {
       // clear IndexedDB databases used for document caching
       await deleteAllDatabases();
     }
+
+    resetPostHog();
 
     // clear all credentials from cache (and local storage via autorun)
     this.currentUserId = null;

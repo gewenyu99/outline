@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { errToString } from "@shared/utils/error";
 import useStores from "~/hooks/useStores";
 import history from "~/utils/history";
+import { captureEvent, capturePostHogException } from "~/utils/posthog";
 import type { FormData } from "./CollectionForm";
 import { CollectionForm } from "./CollectionForm";
 
@@ -24,9 +25,16 @@ export const CollectionNew = observer(function CollectionNew_({
         runInAction(() => {
           collection.documents = [];
         });
+        captureEvent("collection_created", {
+          collection_id: collection.id,
+          has_description: Boolean(data.description),
+        });
         onSubmit?.();
         history.push(collection.path);
       } catch (error) {
+        capturePostHogException(error, {
+          area: "collection_create",
+        });
         toast.error(errToString(error));
       }
     },

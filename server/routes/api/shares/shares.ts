@@ -45,6 +45,7 @@ import {
 import shareDomains from "@server/middlewares/shareDomains";
 import env from "@server/env";
 import { safeEqual } from "@server/utils/crypto";
+import { captureServerEvent } from "@server/utils/posthog";
 
 const router = new Router();
 
@@ -328,6 +329,14 @@ router.post(
     share.collection = collection;
     share.document = document;
 
+    await captureServerEvent(ctx, "share_created", {
+      share_id: share.id,
+      has_collection: Boolean(collectionId),
+      has_document: Boolean(documentId),
+      published,
+      allow_subscriptions: share.allowSubscriptions,
+    });
+
     ctx.body = {
       data: presentShare(share),
       policies: presentPolicies(user, [share]),
@@ -426,6 +435,12 @@ router.post(
     authorize(user, "revoke", share);
 
     await share.revoke(ctx);
+
+    await captureServerEvent(ctx, "share_revoked", {
+      share_id: share.id,
+      has_document: Boolean(share.documentId),
+      has_collection: Boolean(share.collectionId),
+    });
 
     ctx.body = {
       success: true,
@@ -546,6 +561,11 @@ router.post(
       confirmUrl,
       teamName: usePublicBranding ? share.team?.name : undefined,
     }).schedule();
+
+    await captureServerEvent(ctx, "share_subscription_requested", {
+      share_id: share.id,
+      has_document: Boolean(documentId),
+    });
 
     ctx.body = { success: true };
   }

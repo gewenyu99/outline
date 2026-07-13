@@ -59,6 +59,8 @@ class ApiClient {
 
   shareId?: string;
 
+  headers: Record<string, string> = {};
+
   /** Map of in-flight requests for deduplication, keyed by method + path + body. */
   // oxlint-disable-next-line no-explicit-any
   private inflightRequests = new Map<string, Promise<any>>();
@@ -162,6 +164,7 @@ class ApiClient {
       "x-api-version": "4",
       "x-client-version": env.VERSION ? `${version}-${env.VERSION}` : version,
       pragma: "no-cache",
+      ...this.headers,
       ...options?.headers,
     };
 

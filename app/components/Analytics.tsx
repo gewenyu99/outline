@@ -5,6 +5,8 @@ import * as React from "react";
 import type { PublicEnv } from "@shared/types";
 import { IntegrationService } from "@shared/types";
 import env from "~/env";
+import { client } from "~/utils/ApiClient";
+import { getPostHogDistinctId, getPostHogSessionId } from "~/utils/posthog";
 
 type Props = {
   children?: React.ReactNode;
@@ -12,6 +14,19 @@ type Props = {
 
 // TODO: Refactor this component to allow injection from plugins
 const Analytics: React.FC = ({ children }: Props) => {
+  React.useEffect(() => {
+    const distinctId = getPostHogDistinctId();
+    const sessionId = getPostHogSessionId();
+
+    if (distinctId) {
+      client.headers["X-POSTHOG-DISTINCT-ID"] = distinctId;
+    }
+
+    if (sessionId) {
+      client.headers["X-POSTHOG-SESSION-ID"] = sessionId;
+    }
+  }, []);
+
   // Google Analytics 3
   React.useEffect(() => {
     if (!env.GOOGLE_ANALYTICS_ID?.startsWith("UA-")) {

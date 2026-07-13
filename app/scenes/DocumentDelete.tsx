@@ -9,6 +9,7 @@ import Button from "~/components/Button";
 import Flex from "~/components/Flex";
 import Text from "~/components/Text";
 import useStores from "~/hooks/useStores";
+import { captureEvent, capturePostHogException } from "~/utils/posthog";
 import { collectionPath, documentPath, homePath } from "~/utils/routeHelpers";
 
 type Props = {
@@ -38,6 +39,12 @@ function DocumentDelete({ document, onSubmit }: Props) {
       try {
         await document.delete();
 
+        captureEvent("document_deleted", {
+          document_id: document.id,
+          is_draft: document.isDraft,
+          nested_documents_count: nestedDocumentsCount,
+        });
+
         userMemberships
           .getByDocumentId(document.id)
           ?.removeDocument(document.id);
@@ -65,6 +72,10 @@ function DocumentDelete({ document, onSubmit }: Props) {
 
         onSubmit();
       } catch (err) {
+        capturePostHogException(err, {
+          area: "document_delete",
+          document_id: document.id,
+        });
         toast.error(errToString(err));
       } finally {
         setDeleting(false);
@@ -89,8 +100,16 @@ function DocumentDelete({ document, onSubmit }: Props) {
 
       try {
         await document.archive();
+        captureEvent("document_archived", {
+          document_id: document.id,
+          nested_documents_count: nestedDocumentsCount,
+        });
         onSubmit();
       } catch (err) {
+        capturePostHogException(err, {
+          area: "document_archive",
+          document_id: document.id,
+        });
         toast.error(errToString(err));
       } finally {
         setArchiving(false);

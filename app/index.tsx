@@ -19,6 +19,7 @@ import Theme from "~/components/Theme";
 import Toasts from "~/components/Toasts";
 import env from "~/env";
 import { initI18n } from "~/utils/i18n";
+import { initPostHog } from "~/utils/posthog";
 import Desktop from "./components/DesktopEventHandler";
 import LazyPolyfill from "./components/LazyPolyfills";
 import PageScroll from "./components/PageScroll";
@@ -33,6 +34,7 @@ import { ActionContextProvider } from "./hooks/useActionContext";
 void PluginManager.loadPlugins();
 
 initI18n(env.DEFAULT_LANGUAGE);
+initPostHog();
 const element = window.document.getElementById("root");
 
 if (env.SENTRY_DSN) {

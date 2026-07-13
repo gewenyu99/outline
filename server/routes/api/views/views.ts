@@ -10,6 +10,7 @@ import type { APIContext } from "@server/types";
 import { RateLimiterStrategy } from "@server/utils/RateLimiter";
 import * as T from "./schema";
 import { transaction } from "@server/middlewares/transaction";
+import { captureServerEvent } from "@server/utils/posthog";
 
 const router = new Router();
 
@@ -59,6 +60,11 @@ router.post(
     });
 
     view.user = user;
+
+    await captureServerEvent(ctx, "document_view_recorded", {
+      document_id: document.id,
+      team_id: user.teamId,
+    });
 
     ctx.body = {
       data: presentView(view),

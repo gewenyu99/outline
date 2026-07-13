@@ -45,6 +45,7 @@ import { collectionIndexing } from "@server/utils/indexing";
 import pagination from "../middlewares/pagination";
 import * as T from "./schema";
 import { InvalidRequestError } from "@server/errors";
+import { captureServerEvent } from "@server/utils/posthog";
 
 const router = new Router();
 
@@ -96,6 +97,12 @@ router.post(
       userId: user.id,
       transaction,
       rejectOnEmpty: true,
+    });
+
+    await captureServerEvent(ctx, "collection_created_api", {
+      collection_id: reloaded.id,
+      has_description: Boolean(description || data),
+      permission: permission ?? undefined,
     });
 
     ctx.body = {

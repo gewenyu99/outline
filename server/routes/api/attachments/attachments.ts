@@ -27,6 +27,7 @@ import BaseStorage from "@server/storage/files/BaseStorage";
 import type { APIContext } from "@server/types";
 import { RateLimiterStrategy } from "@server/utils/RateLimiter";
 import { assertIn } from "@server/validation";
+import { captureServerEvent } from "@server/utils/posthog";
 import * as T from "./schema";
 
 const router = new Router();
@@ -137,6 +138,13 @@ router.post(
       documentId,
       teamId: user.teamId,
       userId: user.id,
+    });
+
+    await captureServerEvent(ctx, "attachment_created", {
+      attachment_id: attachment.id,
+      preset,
+      document_id: documentId ?? undefined,
+      size,
     });
 
     const usePut = env.AWS_S3_UPLOAD_METHOD === "put";

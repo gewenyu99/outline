@@ -8,6 +8,7 @@ import InputLarge from "~/components/InputLarge";
 import PluginIcon from "~/components/PluginIcon";
 import { client } from "~/utils/ApiClient";
 import Desktop from "~/utils/Desktop";
+import { captureEvent, capturePostHogException } from "~/utils/posthog";
 import { getRedirectUrl } from "~/utils/urls";
 import { PasskeyAuthenticationProvider } from "./PasskeyAuthenticationProvider";
 
@@ -44,6 +45,11 @@ function AuthenticationProvider(props: Props) {
       setSubmitting(true);
 
       try {
+        captureEvent("login_email_requested", {
+          login_method: preferOTP ? "otp" : "magic_link",
+          client: clientType,
+        });
+
         const response = await client.post(event.currentTarget.action, {
           email,
           client: clientType,
@@ -56,7 +62,11 @@ function AuthenticationProvider(props: Props) {
           setSubmitting(false);
           onEmailSuccess?.(email);
         }
-      } catch (_err) {
+      } catch (error) {
+        capturePostHogException(error, {
+          area: "authentication_provider",
+          login_method: preferOTP ? "otp" : "magic_link",
+        });
         setSubmitting(false);
       }
     } else {
@@ -107,7 +117,13 @@ function AuthenticationProvider(props: Props) {
 
   return (
     <ButtonLarge
-      onClick={() => (window.location.href = href)}
+      onClick={() => {
+        captureEvent("login_provider_selected", {
+          provider: id,
+          client: clientType,
+        });
+        window.location.href = href;
+      }}
       icon={<PluginIcon id={id} />}
       fullwidth
       {...rest}
