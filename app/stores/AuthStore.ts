@@ -17,6 +17,7 @@ import { deleteAllDatabases } from "~/utils/developer";
 import Logger from "~/utils/Logger";
 import isCloudHosted from "~/utils/isCloudHosted";
 import Store from "./base/Store";
+import { posthog } from "~/utils/posthog";
 
 type PersistedData = Pick<
   AuthStore,
@@ -230,6 +231,13 @@ export default class AuthStore extends Store<Team> {
           scope.setExtra("teamId", this.currentTeamId);
         }
 
+        posthog.identify(data.user.id, {
+          name: data.user.name,
+          role: data.user.role,
+          team_id: data.team.id,
+          team_name: data.team.name,
+        });
+
         // Redirect to the correct custom domain or team subdomain if needed
         // Occurs when the (sub)domain is changed in admin and the user hits an old url
         const { hostname, pathname } = window.location;
@@ -387,6 +395,8 @@ export default class AuthStore extends Store<Team> {
     this.currentTeamId = null;
     this.collaborationToken = null;
     this.rootStore.clear();
+
+    posthog.reset();
 
     // Tell the host application we logged out, if any – allows window cleanup.
     if (Desktop.isElectron()) {

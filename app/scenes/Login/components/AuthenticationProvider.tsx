@@ -9,6 +9,7 @@ import PluginIcon from "~/components/PluginIcon";
 import { client } from "~/utils/ApiClient";
 import Desktop from "~/utils/Desktop";
 import { getRedirectUrl } from "~/utils/urls";
+import { posthog } from "~/utils/posthog";
 import { PasskeyAuthenticationProvider } from "./PasskeyAuthenticationProvider";
 
 type Props = React.ComponentProps<typeof ButtonLarge> & {
@@ -42,6 +43,9 @@ function AuthenticationProvider(props: Props) {
 
     if (authState === "email" && email) {
       setSubmitting(true);
+      posthog.capture("email_sign_in_submitted", {
+        prefer_otp: preferOTP,
+      });
 
       try {
         const response = await client.post(event.currentTarget.action, {
@@ -107,7 +111,10 @@ function AuthenticationProvider(props: Props) {
 
   return (
     <ButtonLarge
-      onClick={() => (window.location.href = href)}
+      onClick={() => {
+        posthog.capture("login_method_selected", { provider: id });
+        window.location.href = href;
+      }}
       icon={<PluginIcon id={id} />}
       fullwidth
       {...rest}

@@ -1,7 +1,7 @@
 import { capitalize } from "es-toolkit/compat";
 import { observer } from "mobx-react";
 import { CrossIcon, DoneIcon, WarningIcon } from "outline-icons";
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useTheme } from "styled-components";
@@ -17,6 +17,7 @@ import useCurrentUser from "~/hooks/useCurrentUser";
 import useStores from "~/hooks/useStores";
 import { ImportMenu } from "~/menus/ImportMenu";
 import isCloudHosted from "~/utils/isCloudHosted";
+import { posthog } from "~/utils/posthog";
 
 type Props = {
   /** Import that's displayed as list item. */
@@ -31,6 +32,21 @@ export const ImportListItem = observer(({ importModel }: Props) => {
   const showProgress =
     importModel.state !== ImportState.Canceled &&
     importModel.state !== ImportState.Errored;
+
+  const capturedCompletionRef = useRef(false);
+  useEffect(() => {
+    if (
+      importModel.state === ImportState.Completed &&
+      !capturedCompletionRef.current
+    ) {
+      capturedCompletionRef.current = true;
+      posthog.capture("import_completed", {
+        import_id: importModel.id,
+        service: importModel.service,
+        document_count: importModel.documentCount,
+      });
+    }
+  }, [importModel.state, importModel.id, importModel.service, importModel.documentCount]);
 
   const stateMap = useMemo(
     () => ({

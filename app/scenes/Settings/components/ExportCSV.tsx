@@ -7,6 +7,7 @@ import { download } from "~/utils/download";
 import useStores from "~/hooks/useStores";
 import usePolicy from "~/hooks/usePolicy";
 import useCurrentTeam from "~/hooks/useCurrentTeam";
+import { posthog } from "~/utils/posthog";
 
 type Props = {
   /** Request parameters for filtering users */
@@ -62,6 +63,11 @@ export function ExportCSV({ reqParams }: Props) {
       // Trigger download
       download(csv, "members.csv", "text/csv");
       toast.success(t("Members exported successfully"));
+      posthog.capture("members_exported", {
+        member_count: allUsers.length,
+        filter: reqParams.filter,
+        role: reqParams.role,
+      });
     } catch {
       toast.error(t("Failed to export members"));
     } finally {

@@ -14,6 +14,7 @@ import type Revision from "~/models/Revision";
 import type { Editor as TEditor } from "~/editor";
 import { useLocationSidebarContext } from "~/hooks/useLocationSidebarContext";
 import useStores from "~/hooks/useStores";
+import { posthog } from "~/utils/posthog";
 import { documentEditPath } from "~/utils/routeHelpers";
 
 const AUTOSAVE_DELAY = 3000;
@@ -165,9 +166,23 @@ export function useDocumentSave({
       setIsPublishing(!!options.publish);
 
       try {
+        const isNew = document.isNew;
         const savedDocument = await document.save(undefined, options);
         setIsEditorDirty(false);
         isEditorDirtyRef.current = false;
+
+        if (isNew) {
+          posthog.capture("document_created", {
+            document_id: savedDocument.id,
+            collection_id: savedDocument.collectionId,
+            is_draft: savedDocument.isDraft,
+          });
+        } else if (!options.autosave) {
+          posthog.capture("document_saved", {
+            document_id: savedDocument.id,
+            collection_id: savedDocument.collectionId,
+          });
+        }
 
         if (options.done) {
           history.push({
@@ -175,7 +190,7 @@ export function useDocumentSave({
             state: { sidebarContext },
           });
           ui.setActiveDocument(savedDocument);
-        } else if (document.isNew) {
+        } else if (isNew) {
           history.push({
             pathname: documentEditPath(savedDocument),
             state: { sidebarContext },

@@ -14,6 +14,7 @@ import useShareDataLoader from "~/hooks/useShareDataLoader";
 import useStores from "~/hooks/useStores";
 import { preventDefault } from "~/utils/events";
 import lazyWithRetry from "~/utils/lazyWithRetry";
+import { posthog } from "~/utils/posthog";
 
 const SharePopover = lazyWithRetry(
   () => import("~/components/Sharing/Document")
@@ -39,11 +40,15 @@ function ShareButton({ document }: Props) {
       setOpen(isOpen);
       if (isOpen) {
         preload();
+        posthog.capture("document_share_opened", {
+          document_id: document.id,
+          is_publicly_shared: document.isPubliclyShared,
+        });
       } else {
         reset();
       }
     },
-    [preload, reset]
+    [document, preload, reset]
   );
 
   const closePopover = useCallback(() => {

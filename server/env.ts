@@ -504,6 +504,22 @@ export class Environment {
   public RELEASE = this.toOptionalString(environment.RELEASE);
 
   /**
+   * PostHog project API key for client-side analytics.
+   */
+  @Public
+  @IsOptional()
+  public POSTHOG_API_KEY = this.toOptionalString(environment.POSTHOG_API_KEY);
+
+  /**
+   * PostHog API host URL.
+   */
+  @Public
+  @IsOptional()
+  public POSTHOG_API_HOST = this.toOptionalString(
+    environment.POSTHOG_API_HOST
+  );
+
+  /**
    * A Google Analytics tracking ID, supports v3 or v4 properties.
    */
   @Public
