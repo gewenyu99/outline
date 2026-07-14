@@ -11,6 +11,7 @@ import PlaceholderDocument from "~/components/PlaceholderDocument";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import useQuery from "~/hooks/useQuery";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { documentEditPath, documentPath } from "~/utils/routeHelpers";
 
 function DocumentNew() {
@@ -71,7 +72,12 @@ function DocumentNew() {
             : documentEditPath(document),
           location.state
         );
-      } catch (_err) {
+      } catch (err) {
+        posthog.capture("document_creation_failed", {
+          has_collection_context: !!id,
+          has_parent_document: !!parentDocumentId,
+        });
+        posthog.captureException(err, { workflow: "document_creation" });
         toast.error(t("Couldn’t create the document, try again?"));
         history.goBack();
       }

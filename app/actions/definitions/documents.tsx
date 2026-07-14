@@ -45,6 +45,7 @@ import { getEventFiles } from "@shared/utils/files";
 import { Week } from "@shared/utils/time";
 import type UserMembership from "~/models/UserMembership";
 import { client } from "~/utils/ApiClient";
+import posthog from "~/utils/posthog";
 import DocumentDelete from "~/scenes/DocumentDelete";
 import { ProsemirrorHelper } from "~/models/helpers/ProsemirrorHelper";
 import DocumentPermanentDelete from "~/scenes/DocumentPermanentDelete";
@@ -1122,6 +1123,10 @@ export const importDocument = createAction({
             publish: true,
           }
         );
+        posthog.capture("document_imported", {
+          has_collection_context: !!activeCollectionId,
+          is_nested: !!activeDocumentId,
+        });
         history.push(document.url);
       } catch (err) {
         toast.error(errToString(err));

@@ -483,6 +483,21 @@ export class Environment {
   public DROPBOX_APP_KEY = this.toOptionalString(environment.DROPBOX_APP_KEY);
 
   /**
+   * PostHog project token used by the browser and server analytics clients.
+   */
+  @Public
+  @IsOptional()
+  public POSTHOG_KEY = this.toOptionalString(environment.VITE_POSTHOG_KEY);
+
+  /**
+   * PostHog API host used by the browser and server analytics clients.
+   */
+  @Public
+  @IsUrl()
+  @IsOptional()
+  public POSTHOG_HOST = this.toOptionalString(environment.VITE_POSTHOG_HOST);
+
+  /**
    * Sentry DSN for capturing errors and frontend performance.
    */
   @Public

@@ -27,6 +27,7 @@ import Logger from "./utils/Logger";
 import { PluginManager } from "./utils/PluginManager";
 import history from "./utils/history";
 import { initSentry } from "./utils/sentry";
+import "./utils/posthog";
 import { ActionContextProvider } from "./hooks/useActionContext";
 
 // Load plugins as soon as possible

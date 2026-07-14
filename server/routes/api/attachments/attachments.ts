@@ -27,6 +27,7 @@ import BaseStorage from "@server/storage/files/BaseStorage";
 import type { APIContext } from "@server/types";
 import { RateLimiterStrategy } from "@server/utils/RateLimiter";
 import { assertIn } from "@server/validation";
+import posthog from "@server/utils/posthog";
 import * as T from "./schema";
 
 const router = new Router();
@@ -137,6 +138,17 @@ router.post(
       documentId,
       teamId: user.teamId,
       userId: user.id,
+    });
+
+    posthog?.capture({
+      distinctId: user.id,
+      event: "attachment_upload_requested",
+      properties: {
+        content_type: contentType,
+        file_size_bytes: size,
+        has_document_context: !!documentId,
+        preset,
+      },
     });
 
     const usePut = env.AWS_S3_UPLOAD_METHOD === "put";

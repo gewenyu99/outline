@@ -6,6 +6,7 @@ import { ProsemirrorHelper } from "@server/models/helpers/ProsemirrorHelper";
 import { authorize } from "@server/policies";
 import type { APIContext } from "@server/types";
 import { assertPresent } from "@server/validation";
+import posthog from "@server/utils/posthog";
 
 type Props = Optional<
   Pick<
@@ -247,6 +248,17 @@ export default async function documentCreator(
     },
     { data: eventData }
   );
+
+  posthog?.capture({
+    distinctId: user.id,
+    event: "document_created",
+    properties: {
+      has_collection_context: !!collectionId,
+      has_parent_document: !!parentDocumentId,
+      created_from_template: !!templateId,
+      source: eventData?.source ?? "editor",
+    },
+  });
 
   if (publish) {
     if (!collectionId) {

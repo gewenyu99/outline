@@ -195,6 +195,8 @@
     "pluralize": "^8.0.0",
     "png-chunks-extract": "^1.0.0",
     "polished": "^4.3.1",
+    "posthog-js": "^1.399.2",
+    "posthog-node": "^5.40.0",
     "prosemirror-changeset": "2.4.1",
     "prosemirror-codemark": "^0.4.2",
     "prosemirror-commands": "^1.7.1",

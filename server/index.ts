@@ -4,6 +4,7 @@ import { toError } from "@shared/utils/error";
 import env from "./env";
 
 import "./logging/tracer"; // must come before importing any instrumented module
+import "./utils/posthog";
 
 import http from "node:http";
 import https from "node:https";

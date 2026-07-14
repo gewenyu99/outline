@@ -14,6 +14,7 @@ import Text from "~/components/Text";
 import env from "~/env";
 import Logger from "~/utils/Logger";
 import isCloudHosted from "~/utils/isCloudHosted";
+import posthog from "~/utils/posthog";
 import Storage from "@shared/utils/Storage";
 import { deleteAllDatabases } from "~/utils/developer";
 import Flex from "./Flex";
@@ -69,6 +70,7 @@ class ErrorBoundaryClass extends React.Component<Props> {
       return;
     }
 
+    posthog.captureException(error, { source: "error_boundary" });
     Logger.error("ErrorBoundary", error);
   }
 
