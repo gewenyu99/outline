@@ -5,6 +5,7 @@ import * as React from "react";
 import type { PublicEnv } from "@shared/types";
 import { IntegrationService } from "@shared/types";
 import env from "~/env";
+import { initPostHog } from "~/utils/posthog";
 
 type Props = {
   children?: React.ReactNode;
@@ -105,6 +106,11 @@ const Analytics: React.FC = ({ children }: Props) => {
         s.parentNode?.insertBefore(g, s);
       })();
     });
+  }, []);
+
+  // PostHog
+  React.useEffect(() => {
+    initPostHog();
   }, []);
 
   // Umami

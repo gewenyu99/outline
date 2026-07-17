@@ -11,6 +11,7 @@ import Text from "~/components/Text";
 import env from "~/env";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 
 type Props = {
   collection?: Collection;
@@ -62,6 +63,12 @@ function ExportDialog({ collection, onSubmit }: Props) {
         includePrivate,
       });
     }
+
+    posthog.capture("export_started", {
+      format,
+      scope: collection ? "collection" : "workspace",
+      include_attachments: includeAttachments,
+    });
 
     if (response?.data?.fileOperation) {
       const fileOperationId = response.data.fileOperation.id;

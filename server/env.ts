@@ -513,6 +513,20 @@ export class Environment {
   );
 
   /**
+   * A PostHog project API key for product analytics.
+   */
+  @Public
+  @IsOptional()
+  public POSTHOG_API_KEY = this.toOptionalString(environment.POSTHOG_API_KEY);
+
+  /**
+   * The PostHog host to send events to.
+   */
+  @Public
+  @IsOptional()
+  public POSTHOG_HOST = this.toOptionalString(environment.POSTHOG_HOST);
+
+  /**
    * A DataDog API key for tracking server metrics.
    */
   public DD_API_KEY = environment.DD_API_KEY;

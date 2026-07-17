@@ -28,6 +28,7 @@ import { HighlightedText } from "./HighlightText";
 import lazyWithRetry from "~/utils/lazyWithRetry";
 import { mergeRefs } from "react-merge-refs";
 import { HStack } from "~/components/primitives/HStack";
+import posthog from "~/utils/posthog";
 
 const CommentEditor = lazyWithRetry(() => import("./CommentEditor"));
 
@@ -132,6 +133,10 @@ function CommentForm({
         comments
       );
 
+    posthog.capture("comment_created", {
+      has_highlighted_text: !!highlightedText,
+    });
+
     comment
       .save({
         documentId,
@@ -186,6 +191,8 @@ function CommentForm({
         }
       }
     }
+
+    posthog.capture("comment_replied");
 
     const commentDraft = draft;
     onSaveDraft(undefined);

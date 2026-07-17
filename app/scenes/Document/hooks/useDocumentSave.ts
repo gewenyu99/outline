@@ -15,6 +15,7 @@ import type { Editor as TEditor } from "~/editor";
 import { useLocationSidebarContext } from "~/hooks/useLocationSidebarContext";
 import useStores from "~/hooks/useStores";
 import { documentEditPath } from "~/utils/routeHelpers";
+import posthog from "~/utils/posthog";
 
 const AUTOSAVE_DELAY = 3000;
 
@@ -170,6 +171,10 @@ export function useDocumentSave({
         isEditorDirtyRef.current = false;
 
         if (options.done) {
+          posthog.capture("document_saved", {
+            is_new: document.isNew,
+            is_draft: document.isDraft,
+          });
           history.push({
             pathname: savedDocument.url,
             state: { sidebarContext },
