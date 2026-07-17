@@ -1,4 +1,5 @@
 import { observer } from "mobx-react";
+import posthog from "posthog-js";
 import { v4 as uuidv4 } from "uuid";
 import queryString from "query-string";
 import * as React from "react";
@@ -41,7 +42,6 @@ import { SortInput } from "./components/SortInput";
 import UserFilter from "./components/UserFilter";
 import { HStack } from "~/components/primitives/HStack";
 import useMobile from "~/hooks/useMobile";
-import posthog from "~/utils/posthog";
 
 function Search() {
   const { t } = useTranslation();
@@ -124,6 +124,13 @@ function Search() {
         query,
         createdAt: new Date().toISOString(),
       });
+
+      posthog.capture("search_performed", {
+        has_collection_filter: !!collectionId,
+        has_user_filter: !!userId,
+        has_date_filter: !!dateFilter,
+        title_only: titleFilter,
+      });
     }
 
     if (isSearchable) {
@@ -194,12 +201,6 @@ function Search() {
     }
 
     if (ev.key === "Enter") {
-      posthog.capture("search_performed", {
-        has_collection_filter: !!collectionId,
-        has_user_filter: !!userId,
-        has_date_filter: !!dateFilter,
-        title_only: titleFilter,
-      });
       updateLocation(ev.currentTarget.value);
       return;
     }

@@ -1,4 +1,5 @@
 import { observer } from "mobx-react";
+import posthog from "posthog-js";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
@@ -12,7 +13,6 @@ import useCurrentUser from "~/hooks/useCurrentUser";
 import useQuery from "~/hooks/useQuery";
 import useStores from "~/hooks/useStores";
 import { documentEditPath, documentPath } from "~/utils/routeHelpers";
-import posthog from "~/utils/posthog";
 
 function DocumentNew() {
   const history = useHistory();
@@ -56,12 +56,6 @@ function DocumentNew() {
           }
         );
 
-        posthog.capture("document_created", {
-          from_template: !!query.get("templateId"),
-          is_nested: !!parentDocumentId,
-          is_published: !!(collection?.id || parentDocumentId),
-        });
-
         if (parentDocumentId) {
           userMemberships
             .getByDocumentId(document.id)
@@ -71,6 +65,12 @@ function DocumentNew() {
             .getByDocumentId(document.id)
             ?.addDocument(document, parentDocumentId);
         }
+
+        posthog.capture("document_created", {
+          collection_id: document.collectionId,
+          has_template: !!query.get("templateId"),
+          has_parent: !!parentDocumentId,
+        });
 
         history.replace(
           !user.separateEditMode

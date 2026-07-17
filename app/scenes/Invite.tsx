@@ -1,5 +1,6 @@
 import { observer } from "mobx-react";
 import { PlusIcon } from "outline-icons";
+import posthog from "posthog-js";
 import pluralize from "pluralize";
 import * as React from "react";
 import { useTranslation, Trans } from "react-i18next";
@@ -22,7 +23,6 @@ import useCurrentTeam from "~/hooks/useCurrentTeam";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import usePolicy from "~/hooks/usePolicy";
 import useStores from "~/hooks/useStores";
-import posthog from "~/utils/posthog";
 
 type Props = {
   onSubmit: () => void;
@@ -58,10 +58,9 @@ function Invite({ onSubmit }: Props) {
         const response = await users.invite(
           invites.filter((i) => i.email).map((memo) => ({ ...memo, role }))
         );
-        onSubmit();
 
         if (response.length > 0) {
-          posthog.capture("invite_sent", {
+          posthog.capture("team_members_invited", {
             count: response.length,
             role,
           });
@@ -71,6 +70,8 @@ function Invite({ onSubmit }: Props) {
         } else {
           toast.message(t("Those email addresses are already invited"));
         }
+
+        onSubmit();
       } catch (err) {
         toast.error(errToString(err));
       } finally {

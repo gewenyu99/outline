@@ -1,4 +1,5 @@
 import { observer } from "mobx-react";
+import posthog from "posthog-js";
 import { useState, useMemo } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { toast } from "sonner";
@@ -12,7 +13,6 @@ import Flex from "~/components/Flex";
 import Text from "~/components/Text";
 import useCollectionTrees from "~/hooks/useCollectionTrees";
 import useStores from "~/hooks/useStores";
-import posthog from "~/utils/posthog";
 
 type Props = {
   /** Document to publish */
@@ -54,7 +54,9 @@ function DocumentPublish({ document }: Props) {
       await document.save(undefined, { publish: true });
 
       posthog.capture("document_published", {
-        nested_under_document: type === "document",
+        collection_id: collectionId,
+        document_id: document.id,
+        has_parent: type === "document",
       });
 
       toast.success(t("Document published"));

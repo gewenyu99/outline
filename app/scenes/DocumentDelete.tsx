@@ -10,7 +10,6 @@ import Flex from "~/components/Flex";
 import Text from "~/components/Text";
 import useStores from "~/hooks/useStores";
 import { collectionPath, documentPath, homePath } from "~/utils/routeHelpers";
-import posthog from "~/utils/posthog";
 
 type Props = {
   document: Document;
@@ -38,12 +37,6 @@ function DocumentDelete({ document, onSubmit }: Props) {
 
       try {
         await document.delete();
-
-        posthog.capture("document_deleted", {
-          has_nested_documents: nestedDocumentsCount > 0,
-          nested_documents_count: nestedDocumentsCount,
-          was_draft: document.isDraft,
-        });
 
         userMemberships
           .getByDocumentId(document.id)
@@ -96,7 +89,6 @@ function DocumentDelete({ document, onSubmit }: Props) {
 
       try {
         await document.archive();
-        posthog.capture("document_archived");
         onSubmit();
       } catch (err) {
         toast.error(errToString(err));

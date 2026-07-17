@@ -1,4 +1,5 @@
 import { observer } from "mobx-react";
+import posthog from "posthog-js";
 import * as React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -11,7 +12,6 @@ import Text from "~/components/Text";
 import env from "~/env";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import useStores from "~/hooks/useStores";
-import posthog from "~/utils/posthog";
 
 type Props = {
   collection?: Collection;

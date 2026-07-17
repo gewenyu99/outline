@@ -513,14 +513,14 @@ export class Environment {
   );
 
   /**
-   * A PostHog project API key for product analytics.
+   * A PostHog project API key for capturing analytics events.
    */
   @Public
   @IsOptional()
   public POSTHOG_API_KEY = this.toOptionalString(environment.POSTHOG_API_KEY);
 
   /**
-   * The PostHog host to send events to.
+   * The PostHog host URL for ingest.
    */
   @Public
   @IsOptional()

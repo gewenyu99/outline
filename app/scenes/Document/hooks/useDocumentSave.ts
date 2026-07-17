@@ -1,4 +1,5 @@
 import { cloneDeep, debounce, isEqual } from "es-toolkit/compat";
+import posthog from "posthog-js";
 import { Node } from "prosemirror-model";
 import type { Selection } from "prosemirror-state";
 import { AllSelection, TextSelection } from "prosemirror-state";
@@ -15,7 +16,6 @@ import type { Editor as TEditor } from "~/editor";
 import { useLocationSidebarContext } from "~/hooks/useLocationSidebarContext";
 import useStores from "~/hooks/useStores";
 import { documentEditPath } from "~/utils/routeHelpers";
-import posthog from "~/utils/posthog";
 
 const AUTOSAVE_DELAY = 3000;
 
@@ -170,11 +170,16 @@ export function useDocumentSave({
         setIsEditorDirty(false);
         isEditorDirtyRef.current = false;
 
-        if (options.done) {
+        if (!options.autosave) {
           posthog.capture("document_saved", {
-            is_new: document.isNew,
-            is_draft: document.isDraft,
+            document_id: savedDocument.id,
+            collection_id: savedDocument.collectionId,
+            is_draft: savedDocument.isDraft,
+            done: !!options.done,
           });
+        }
+
+        if (options.done) {
           history.push({
             pathname: savedDocument.url,
             state: { sidebarContext },
