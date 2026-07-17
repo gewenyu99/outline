@@ -1,3 +1,4 @@
+import posthog from "posthog-js";
 import { Redirect } from "react-router-dom";
 import env from "~/env";
 import useStores from "~/hooks/useStores";
@@ -5,6 +6,10 @@ import { logoutPath } from "~/utils/routeHelpers";
 
 const Logout = () => {
   const { auth } = useStores();
+
+  if (env.POSTHOG_API_KEY) {
+    posthog.reset();
+  }
 
   void auth.logout({
     userInitiated: true,

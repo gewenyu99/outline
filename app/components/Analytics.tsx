@@ -1,10 +1,13 @@
 /* oxlint-disable prefer-rest-params */
 /* global ga */
 import { escape } from "es-toolkit/compat";
+import { reaction } from "mobx";
+import posthog from "posthog-js";
 import * as React from "react";
 import type { PublicEnv } from "@shared/types";
 import { IntegrationService } from "@shared/types";
 import env from "~/env";
+import useStores from "~/hooks/useStores";
 
 type Props = {
   children?: React.ReactNode;
@@ -12,6 +15,46 @@ type Props = {
 
 // TODO: Refactor this component to allow injection from plugins
 const Analytics: React.FC = ({ children }: Props) => {
+  const { auth } = useStores();
+
+  // PostHog
+  React.useEffect(() => {
+    if (!env.POSTHOG_API_KEY) {
+      return;
+    }
+
+    posthog.init(env.POSTHOG_API_KEY, {
+      api_host: env.POSTHOG_HOST ?? "https://us.i.posthog.com",
+      capture_pageview: "history_change",
+      person_profiles: "identified_only",
+    });
+  }, []);
+
+  // Identify the current user once authenticated, reactively via MobX
+  React.useEffect(() => {
+    if (!env.POSTHOG_API_KEY) {
+      return;
+    }
+
+    const dispose = reaction(
+      () => ({ user: auth.user, team: auth.team }),
+      ({ user, team }) => {
+        if (user && team) {
+          posthog.identify(user.id, {
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            team_id: team.id,
+            team_name: team.name,
+          });
+        }
+      },
+      { fireImmediately: true }
+    );
+
+    return dispose;
+  }, [auth]);
+
   // Google Analytics 3
   React.useEffect(() => {
     if (!env.GOOGLE_ANALYTICS_ID?.startsWith("UA-")) {

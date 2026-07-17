@@ -1,4 +1,5 @@
 import { cloneDeep, debounce, isEqual } from "es-toolkit/compat";
+import posthog from "posthog-js";
 import { Node } from "prosemirror-model";
 import type { Selection } from "prosemirror-state";
 import { AllSelection, TextSelection } from "prosemirror-state";
@@ -168,6 +169,15 @@ export function useDocumentSave({
         const savedDocument = await document.save(undefined, options);
         setIsEditorDirty(false);
         isEditorDirtyRef.current = false;
+
+        if (!options.autosave) {
+          posthog.capture("document_saved", {
+            document_id: savedDocument.id,
+            collection_id: savedDocument.collectionId,
+            is_draft: savedDocument.isDraft,
+            done: !!options.done,
+          });
+        }
 
         if (options.done) {
           history.push({

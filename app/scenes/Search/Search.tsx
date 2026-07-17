@@ -1,4 +1,5 @@
 import { observer } from "mobx-react";
+import posthog from "posthog-js";
 import { v4 as uuidv4 } from "uuid";
 import queryString from "query-string";
 import * as React from "react";
@@ -122,6 +123,13 @@ function Search() {
         id: uuidv4(),
         query,
         createdAt: new Date().toISOString(),
+      });
+
+      posthog.capture("search_performed", {
+        has_collection_filter: !!collectionId,
+        has_user_filter: !!userId,
+        has_date_filter: !!dateFilter,
+        title_only: titleFilter,
       });
     }
 

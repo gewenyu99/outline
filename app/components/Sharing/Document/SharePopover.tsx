@@ -1,6 +1,7 @@
 import { isEmail } from "class-validator";
 import { m } from "framer-motion";
 import { observer } from "mobx-react";
+import posthog from "posthog-js";
 import { BackIcon } from "outline-icons";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
@@ -232,6 +233,13 @@ function SharePopover({
               );
             }
           }
+
+          posthog.capture("document_member_added", {
+            document_id: document.id,
+            users_count: invitedUsers.length,
+            groups_count: invitedGroups.length,
+            permission,
+          });
 
           setInvitedInSession((prev) => [...prev, ...pendingIds]);
           setPendingIds([]);

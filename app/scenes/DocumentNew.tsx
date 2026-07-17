@@ -1,4 +1,5 @@
 import { observer } from "mobx-react";
+import posthog from "posthog-js";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
@@ -64,6 +65,12 @@ function DocumentNew() {
             .getByDocumentId(document.id)
             ?.addDocument(document, parentDocumentId);
         }
+
+        posthog.capture("document_created", {
+          collection_id: document.collectionId,
+          has_template: !!query.get("templateId"),
+          has_parent: !!parentDocumentId,
+        });
 
         history.replace(
           !user.separateEditMode

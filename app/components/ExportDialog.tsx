@@ -1,4 +1,5 @@
 import { observer } from "mobx-react";
+import posthog from "posthog-js";
 import * as React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -62,6 +63,12 @@ function ExportDialog({ collection, onSubmit }: Props) {
         includePrivate,
       });
     }
+
+    posthog.capture("export_started", {
+      format,
+      scope: collection ? "collection" : "workspace",
+      include_attachments: includeAttachments,
+    });
 
     if (response?.data?.fileOperation) {
       const fileOperationId = response.data.fileOperation.id;

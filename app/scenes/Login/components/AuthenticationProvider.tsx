@@ -1,4 +1,5 @@
 import { EmailIcon } from "outline-icons";
+import posthog from "posthog-js";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -42,6 +43,11 @@ function AuthenticationProvider(props: Props) {
 
     if (authState === "email" && email) {
       setSubmitting(true);
+
+      posthog.capture("login_attempted", {
+        provider: "email",
+        is_create: isCreate,
+      });
 
       try {
         const response = await client.post(event.currentTarget.action, {
@@ -107,7 +113,13 @@ function AuthenticationProvider(props: Props) {
 
   return (
     <ButtonLarge
-      onClick={() => (window.location.href = href)}
+      onClick={() => {
+        posthog.capture("login_attempted", {
+          provider: id,
+          is_create: isCreate,
+        });
+        window.location.href = href;
+      }}
       icon={<PluginIcon id={id} />}
       fullwidth
       {...rest}

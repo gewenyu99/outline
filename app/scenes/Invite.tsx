@@ -1,5 +1,6 @@
 import { observer } from "mobx-react";
 import { PlusIcon } from "outline-icons";
+import posthog from "posthog-js";
 import pluralize from "pluralize";
 import * as React from "react";
 import { useTranslation, Trans } from "react-i18next";
@@ -57,15 +58,20 @@ function Invite({ onSubmit }: Props) {
         const response = await users.invite(
           invites.filter((i) => i.email).map((memo) => ({ ...memo, role }))
         );
-        onSubmit();
 
         if (response.length > 0) {
+          posthog.capture("team_members_invited", {
+            count: response.length,
+            role,
+          });
           toast.success(
             t("{{ count }} invites sent", { count: response.length })
           );
         } else {
           toast.message(t("Those email addresses are already invited"));
         }
+
+        onSubmit();
       } catch (err) {
         toast.error(errToString(err));
       } finally {

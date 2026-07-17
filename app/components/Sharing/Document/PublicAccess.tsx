@@ -1,6 +1,7 @@
 import copy from "copy-to-clipboard";
 import { debounce, isEmpty } from "es-toolkit/compat";
 import { observer } from "mobx-react";
+import posthog from "posthog-js";
 import { CopyIcon, GlobeIcon } from "outline-icons";
 import * as React from "react";
 import { Trans, useTranslation } from "react-i18next";
@@ -73,9 +74,17 @@ function PublicAccess(
             published: true,
           });
           copy(newShare.url);
+          posthog.capture("document_shared_publicly", {
+            document_id: document.id,
+            published: true,
+          });
           toast.success(t("Public link copied to clipboard"));
         } else if (share) {
           await share.save({ published: checked });
+          posthog.capture("document_shared_publicly", {
+            document_id: document.id,
+            published: checked,
+          });
           if (checked) {
             copy(share.url);
             toast.success(t("Public link copied to clipboard"));

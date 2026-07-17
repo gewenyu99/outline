@@ -1,4 +1,5 @@
 import { observer } from "mobx-react";
+import posthog from "posthog-js";
 import { useState, useMemo } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { toast } from "sonner";
@@ -51,6 +52,12 @@ function DocumentPublish({ document }: Props) {
 
       document.collectionId = collectionId;
       await document.save(undefined, { publish: true });
+
+      posthog.capture("document_published", {
+        collection_id: collectionId,
+        document_id: document.id,
+        has_parent: type === "document",
+      });
 
       toast.success(t("Document published"));
 
