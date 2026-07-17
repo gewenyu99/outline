@@ -22,6 +22,7 @@ import TemplateMenu from "~/menus/TemplateMenu";
 import { collectionPath, settingsPath } from "~/utils/routeHelpers";
 import type Template from "~/models/Template";
 import history from "~/utils/history";
+import posthog from "~/utils/posthog";
 
 type Props = {
   template: Template;
@@ -100,6 +101,9 @@ const TemplateSetting = observer(function Template_({ template }: Props) {
     setSaving(true);
     try {
       await template.save();
+      posthog.capture("template_saved", {
+        is_new: false,
+      });
       history.push(settingsPath("templates"));
     } catch (error) {
       toast.error(errToString(error));

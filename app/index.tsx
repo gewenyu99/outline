@@ -18,6 +18,7 @@ import ScrollToTop from "~/components/ScrollToTop";
 import Theme from "~/components/Theme";
 import Toasts from "~/components/Toasts";
 import env from "~/env";
+import "~/utils/posthog";
 import { initI18n } from "~/utils/i18n";
 import Desktop from "./components/DesktopEventHandler";
 import LazyPolyfill from "./components/LazyPolyfills";

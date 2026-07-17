@@ -16,6 +16,7 @@ import Desktop from "~/utils/Desktop";
 import { deleteAllDatabases } from "~/utils/developer";
 import Logger from "~/utils/Logger";
 import isCloudHosted from "~/utils/isCloudHosted";
+import posthog from "~/utils/posthog";
 import Store from "./base/Store";
 
 type PersistedData = Pick<
@@ -220,6 +221,12 @@ export default class AuthStore extends Store<Team> {
         this.currentUserId = data.user.id;
         this.currentTeamId = data.team.id;
 
+        posthog.identify(data.user.id, {
+          email: data.user.email,
+          name: data.user.name,
+          role: data.user.role,
+        });
+
         this.availableTeams = res.data.availableTeams;
         this.collaborationToken = res.data.collaborationToken;
 
@@ -347,6 +354,8 @@ export default class AuthStore extends Store<Team> {
     if (savePath) {
       setPostLoginPath(window.location.pathname + window.location.search);
     }
+
+    posthog.reset();
 
     if (revokeToken) {
       try {

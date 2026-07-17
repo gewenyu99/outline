@@ -18,6 +18,7 @@ import useQuery from "~/hooks/useQuery";
 import useStores from "~/hooks/useStores";
 import { collectionPath, settingsPath } from "~/utils/routeHelpers";
 import history from "~/utils/history";
+import posthog from "~/utils/posthog";
 
 function TemplateNewScene() {
   const { t } = useTranslation();
@@ -62,6 +63,9 @@ function TemplateNewScene() {
     setSaving(true);
     try {
       await template.save();
+      posthog.capture("template_saved", {
+        is_new: true,
+      });
       history.push(settingsPath("templates"));
     } catch (error) {
       toast.error(errToString(error));

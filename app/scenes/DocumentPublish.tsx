@@ -12,6 +12,7 @@ import Flex from "~/components/Flex";
 import Text from "~/components/Text";
 import useCollectionTrees from "~/hooks/useCollectionTrees";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 
 type Props = {
   /** Document to publish */
@@ -52,6 +53,9 @@ function DocumentPublish({ document }: Props) {
       document.collectionId = collectionId;
       await document.save(undefined, { publish: true });
 
+      posthog.capture("document_published", {
+        published_to_child_document: type === "document",
+      });
       toast.success(t("Document published"));
 
       dialogs.closeAllModals();
