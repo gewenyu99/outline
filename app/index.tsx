@@ -18,7 +18,7 @@ import ScrollToTop from "~/components/ScrollToTop";
 import Theme from "~/components/Theme";
 import Toasts from "~/components/Toasts";
 import env from "~/env";
-import "~/utils/posthog";
+import posthog from "~/utils/posthog";
 import { initI18n } from "~/utils/i18n";
 import Desktop from "./components/DesktopEventHandler";
 import LazyPolyfill from "./components/LazyPolyfills";
@@ -38,6 +38,18 @@ const element = window.document.getElementById("root");
 
 if (env.SENTRY_DSN) {
   initSentry(history);
+}
+
+if (env.POSTHOG_PROJECT_TOKEN && env.POSTHOG_HOST) {
+  posthog.init(env.POSTHOG_PROJECT_TOKEN, {
+    api_host: env.POSTHOG_HOST,
+    defaults: "2026-05-30",
+    capture_exceptions: {
+      capture_unhandled_errors: true,
+      capture_unhandled_rejections: true,
+      capture_console_errors: false,
+    },
+  });
 }
 
 configureMobx({

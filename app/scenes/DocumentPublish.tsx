@@ -54,7 +54,8 @@ function DocumentPublish({ document }: Props) {
       await document.save(undefined, { publish: true });
 
       posthog.capture("document_published", {
-        published_to_child_document: type === "document",
+        destination_type: type,
+        is_moved: type === "document",
       });
       toast.success(t("Document published"));
 

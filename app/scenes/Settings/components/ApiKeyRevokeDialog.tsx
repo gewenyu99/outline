@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type ApiKey from "~/models/ApiKey";
 import ConfirmationDialog from "~/components/ConfirmationDialog";
-import posthog from "~/utils/posthog";
 
 type Props = {
   apiKey: ApiKey;
@@ -13,7 +12,6 @@ export default function ApiKeyRevokeDialog({ apiKey, onSubmit }: Props) {
 
   const handleSubmit = async () => {
     await apiKey.delete();
-    posthog.capture("api_key_revoked");
     onSubmit();
   };
 

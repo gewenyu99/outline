@@ -18,7 +18,7 @@ export function CopyLinkButton({
   const timeout = useRef<ReturnType<typeof setTimeout>>();
 
   const handleCopied = useCallback(() => {
-    posthog.capture("shared_document_link_copied");
+    posthog.capture("document_share_link_copied");
     onCopy();
 
     timeout.current = setTimeout(() => {

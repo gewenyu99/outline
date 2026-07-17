@@ -57,9 +57,9 @@ function DocumentNew() {
         );
 
         posthog.capture("document_created", {
-          has_collection: Boolean(collection?.id),
+          is_published: Boolean(collection?.id || parentDocumentId),
+          is_from_template: Boolean(query.get("templateId")),
           has_parent_document: Boolean(parentDocumentId),
-          created_from_template: Boolean(query.get("templateId")),
         });
 
         if (parentDocumentId) {

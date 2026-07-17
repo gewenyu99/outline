@@ -20,8 +20,8 @@ import usePolicy from "~/hooks/usePolicy";
 import usePrevious from "~/hooks/usePrevious";
 import useShareDataLoader from "~/hooks/useShareDataLoader";
 import useStores from "~/hooks/useStores";
-import type { Permission } from "~/types";
 import posthog from "~/utils/posthog";
+import type { Permission } from "~/types";
 import { documentPath, urlify } from "~/utils/routeHelpers";
 import { Wrapper, presence } from "../components";
 import { CopyLinkButton } from "../components/CopyLinkButton";
@@ -234,12 +234,11 @@ function SharePopover({
             }
           }
 
-          posthog.capture("document_members_invited", {
-            invited_user_count: invitedUsers.length,
-            invited_group_count: invitedGroups.length,
+          posthog.capture("document_members_added", {
+            people_added_count: invitedUsers.length,
+            groups_added_count: invitedGroups.length,
             permission,
           });
-
           setInvitedInSession((prev) => [...prev, ...pendingIds]);
           setPendingIds([]);
           hidePicker();

@@ -349,13 +349,13 @@ export default class AuthStore extends Store<Team> {
     savePath?: boolean;
     userInitiated?: boolean;
   }) => {
+    posthog.reset();
+
     // if this logout was forced from an authenticated route then
     // save the current path so we can go back there once signed in
     if (savePath) {
       setPostLoginPath(window.location.pathname + window.location.search);
     }
-
-    posthog.reset();
 
     if (revokeToken) {
       try {

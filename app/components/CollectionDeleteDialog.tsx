@@ -7,6 +7,7 @@ import ConfirmationDialog from "~/components/ConfirmationDialog";
 import Text from "~/components/Text";
 import useCurrentTeam from "~/hooks/useCurrentTeam";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { homePath } from "~/utils/routeHelpers";
 
 type Props = {
@@ -28,6 +29,10 @@ function CollectionDeleteDialog({ collection, onSubmit }: Props) {
     }
 
     await collection.delete();
+    posthog.capture("collection_deleted", {
+      was_active_collection: redirect,
+      was_default_collection: team.defaultCollectionId === collection.id,
+    });
     onSubmit();
     toast.success(t("Collection deleted"));
   };

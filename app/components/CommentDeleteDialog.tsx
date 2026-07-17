@@ -6,6 +6,7 @@ import type Comment from "~/models/Comment";
 import ConfirmationDialog from "~/components/ConfirmationDialog";
 import Text from "~/components/Text";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 
 type Props = {
   comment: Comment;
@@ -20,6 +21,9 @@ function CommentDeleteDialog({ comment, onSubmit }: Props) {
   const handleSubmit = async () => {
     try {
       await comment.delete();
+      posthog.capture("comment_deleted", {
+        includes_thread: hasChildComments,
+      });
       onSubmit?.();
     } catch (err) {
       toast.error(errToString(err));

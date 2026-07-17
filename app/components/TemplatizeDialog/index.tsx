@@ -8,6 +8,7 @@ import ConfirmationDialog from "~/components/ConfirmationDialog";
 import Flex from "~/components/Flex";
 import Switch from "~/components/Switch";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import SelectLocation from "./SelectLocation";
 
 type Props = {
@@ -34,6 +35,10 @@ function DocumentTemplatizeDialog({ documentId }: Props) {
     });
 
     if (template) {
+      posthog.capture("document_templatized", {
+        is_published: publish,
+        has_collection: Boolean(collectionId),
+      });
       history.push(template.path);
       toast.success(t("Template created, go ahead and customize it"));
     }

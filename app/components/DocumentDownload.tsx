@@ -50,6 +50,11 @@ export const DocumentDownload = observer(({ document, onSubmit }: Props) => {
       includeChildDocuments,
     });
 
+    posthog.capture("document_export_requested", {
+      content_type: contentType,
+      includes_child_documents: includeChildDocuments,
+    });
+
     if (includeChildDocuments && response?.data?.fileOperation) {
       const fileOperationId = response.data.fileOperation.id;
       const toastId = `export-${fileOperationId}`;
@@ -72,10 +77,6 @@ export const DocumentDownload = observer(({ document, onSubmit }: Props) => {
       });
     }
 
-    posthog.capture("document_exported", {
-      content_type: contentType,
-      includes_child_documents: includeChildDocuments,
-    });
     onSubmit();
   }, [t, ui, document, contentType, includeChildDocuments, onSubmit]);
 
