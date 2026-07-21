@@ -11,8 +11,8 @@ import PlaceholderDocument from "~/components/PlaceholderDocument";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import useQuery from "~/hooks/useQuery";
 import useStores from "~/hooks/useStores";
-import posthog from "~/utils/posthog";
 import { documentEditPath, documentPath } from "~/utils/routeHelpers";
+import posthog from "~/utils/posthog";
 
 function DocumentNew() {
   const history = useHistory();
@@ -57,9 +57,9 @@ function DocumentNew() {
         );
 
         posthog.capture("document_created", {
-          is_published: Boolean(collection?.id || parentDocumentId),
-          is_from_template: Boolean(query.get("templateId")),
-          has_parent_document: Boolean(parentDocumentId),
+          created_from_template: Boolean(query.get("templateId")),
+          created_as_child: Boolean(parentDocumentId),
+          published_immediately: Boolean(collection?.id || parentDocumentId),
         });
 
         if (parentDocumentId) {

@@ -49,8 +49,7 @@ export const DocumentDownload = observer(({ document, onSubmit }: Props) => {
       contentType,
       includeChildDocuments,
     });
-
-    posthog.capture("document_export_requested", {
+    posthog.capture("document_export_started", {
       content_type: contentType,
       includes_child_documents: includeChildDocuments,
     });

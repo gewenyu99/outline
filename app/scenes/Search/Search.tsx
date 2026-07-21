@@ -41,6 +41,7 @@ import { SortInput } from "./components/SortInput";
 import UserFilter from "./components/UserFilter";
 import { HStack } from "~/components/primitives/HStack";
 import useMobile from "~/hooks/useMobile";
+import posthog from "~/utils/posthog";
 
 function Search() {
   const { t } = useTranslation();
@@ -193,6 +194,12 @@ function Search() {
     }
 
     if (ev.key === "Enter") {
+      posthog.capture("search_executed", {
+        searched_in_document: Boolean(documentId),
+        searched_in_collection: Boolean(collectionId),
+        searched_by_user: Boolean(userId),
+        titles_only: titleFilter,
+      });
       updateLocation(ev.currentTarget.value);
       return;
     }

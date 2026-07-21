@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import CopyToClipboard from "~/components/CopyToClipboard";
 import NudeButton from "~/components/NudeButton";
 import Tooltip from "~/components/Tooltip";
-import posthog from "~/utils/posthog";
 
 export function CopyLinkButton({
   url,
@@ -18,7 +17,6 @@ export function CopyLinkButton({
   const timeout = useRef<ReturnType<typeof setTimeout>>();
 
   const handleCopied = useCallback(() => {
-    posthog.capture("document_share_link_copied");
     onCopy();
 
     timeout.current = setTimeout(() => {

@@ -52,11 +52,10 @@ function DocumentPublish({ document }: Props) {
 
       document.collectionId = collectionId;
       await document.save(undefined, { publish: true });
-
       posthog.capture("document_published", {
-        destination_type: type,
-        is_moved: type === "document",
+        published_to_existing_document: type === "document",
       });
+
       toast.success(t("Document published"));
 
       dialogs.closeAllModals();

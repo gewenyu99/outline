@@ -63,7 +63,7 @@ function Invite({ onSubmit }: Props) {
         if (response.length > 0) {
           posthog.capture("workspace_invites_sent", {
             invite_count: response.length,
-            role,
+            invited_role: role,
           });
           toast.success(
             t("{{ count }} invites sent", { count: response.length })

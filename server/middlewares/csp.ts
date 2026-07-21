@@ -70,10 +70,6 @@ export default function createCSPMiddleware(options?: CSPOptions) {
     scriptSrc.push("www.google-analytics.com");
   }
 
-  if (env.POSTHOG_PROJECT_TOKEN) {
-    scriptSrc.push("https://*.posthog.com");
-  }
-
   if (env.CDN_URL) {
     scriptSrc.push(env.CDN_URL);
     styleSrc.push(env.CDN_URL);
@@ -111,9 +107,7 @@ export default function createCSPMiddleware(options?: CSPOptions) {
       mediaSrc: ["*", "data:", "blob:"],
       imgSrc: ["*", "data:", "blob:"],
       frameSrc: ["*", "data:"],
-      workerSrc: env.POSTHOG_PROJECT_TOKEN
-        ? ["'self'", "blob:", "data:"]
-        : ["'self'"],
+      workerSrc: ["'self'"],
       objectSrc,
       // Do not use connect-src: because self + websockets does not work in
       // Safari, ref: https://bugs.webkit.org/show_bug.cgi?id=201591

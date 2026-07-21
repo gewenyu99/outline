@@ -40,6 +40,7 @@ export type Config = {
 
 export default class AuthStore extends Store<Team> {
   private name = "AUTH_STORE";
+  private posthogUserId?: string;
 
   /* The ID of the user that is currently signed in. */
   @observable
@@ -221,11 +222,15 @@ export default class AuthStore extends Store<Team> {
         this.currentUserId = data.user.id;
         this.currentTeamId = data.team.id;
 
+        if (this.posthogUserId && this.posthogUserId !== data.user.id) {
+          posthog.reset();
+        }
         posthog.identify(data.user.id, {
           email: data.user.email,
           name: data.user.name,
           role: data.user.role,
         });
+        this.posthogUserId = data.user.id;
 
         this.availableTeams = res.data.availableTeams;
         this.collaborationToken = res.data.collaborationToken;
@@ -349,7 +354,10 @@ export default class AuthStore extends Store<Team> {
     savePath?: boolean;
     userInitiated?: boolean;
   }) => {
-    posthog.reset();
+    if (this.posthogUserId) {
+      posthog.reset();
+      this.posthogUserId = undefined;
+    }
 
     // if this logout was forced from an authenticated route then
     // save the current path so we can go back there once signed in

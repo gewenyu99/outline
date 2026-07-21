@@ -22,7 +22,7 @@ function CommentDeleteDialog({ comment, onSubmit }: Props) {
     try {
       await comment.delete();
       posthog.capture("comment_deleted", {
-        includes_thread: hasChildComments,
+        deleted_thread: hasChildComments,
       });
       onSubmit?.();
     } catch (err) {

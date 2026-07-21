@@ -20,9 +20,9 @@ import usePolicy from "~/hooks/usePolicy";
 import usePrevious from "~/hooks/usePrevious";
 import useShareDataLoader from "~/hooks/useShareDataLoader";
 import useStores from "~/hooks/useStores";
-import posthog from "~/utils/posthog";
 import type { Permission } from "~/types";
 import { documentPath, urlify } from "~/utils/routeHelpers";
+import posthog from "~/utils/posthog";
 import { Wrapper, presence } from "../components";
 import { CopyLinkButton } from "../components/CopyLinkButton";
 import { PermissionAction } from "../components/PermissionAction";
@@ -235,8 +235,8 @@ function SharePopover({
           }
 
           posthog.capture("document_members_added", {
-            people_added_count: invitedUsers.length,
-            groups_added_count: invitedGroups.length,
+            user_count: invitedUsers.length,
+            group_count: invitedGroups.length,
             permission,
           });
           setInvitedInSession((prev) => [...prev, ...pendingIds]);
