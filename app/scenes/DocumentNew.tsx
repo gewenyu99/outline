@@ -12,6 +12,7 @@ import useCurrentUser from "~/hooks/useCurrentUser";
 import useQuery from "~/hooks/useQuery";
 import useStores from "~/hooks/useStores";
 import { documentEditPath, documentPath } from "~/utils/routeHelpers";
+import posthog from "~/utils/posthog";
 
 function DocumentNew() {
   const history = useHistory();
@@ -54,6 +55,12 @@ function DocumentNew() {
             index,
           }
         );
+
+        posthog.capture("document_created", {
+          created_from_template: Boolean(query.get("templateId")),
+          created_as_child: Boolean(parentDocumentId),
+          published_immediately: Boolean(collection?.id || parentDocumentId),
+        });
 
         if (parentDocumentId) {
           userMemberships

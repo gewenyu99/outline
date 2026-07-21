@@ -11,6 +11,7 @@ import Text from "~/components/Text";
 import env from "~/env";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 
 type Props = {
   document: Document;
@@ -47,6 +48,10 @@ export const DocumentDownload = observer(({ document, onSubmit }: Props) => {
     const response = await document.download({
       contentType,
       includeChildDocuments,
+    });
+    posthog.capture("document_export_started", {
+      content_type: contentType,
+      includes_child_documents: includeChildDocuments,
     });
 
     if (includeChildDocuments && response?.data?.fileOperation) {

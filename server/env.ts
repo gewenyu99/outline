@@ -504,6 +504,23 @@ export class Environment {
   public RELEASE = this.toOptionalString(environment.RELEASE);
 
   /**
+   * A PostHog project token for browser analytics.
+   */
+  @Public
+  @IsOptional()
+  public POSTHOG_PROJECT_TOKEN = this.toOptionalString(
+    environment.POSTHOG_PROJECT_TOKEN
+  );
+
+  /**
+   * The PostHog host for browser analytics.
+   */
+  @Public
+  @IsUrl()
+  @IsOptional()
+  public POSTHOG_HOST = this.toOptionalString(environment.POSTHOG_HOST);
+
+  /**
    * A Google Analytics tracking ID, supports v3 or v4 properties.
    */
   @Public
