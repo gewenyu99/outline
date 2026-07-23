@@ -9,6 +9,7 @@ import Button from "~/components/Button";
 import Text from "~/components/Text";
 import useCollectionTrees from "~/hooks/useCollectionTrees";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { FlexContainer, Footer } from "./Components";
 import DocumentExplorer from "./DocumentExplorer";
 
@@ -74,6 +75,9 @@ function DocumentMove({ document }: Props) {
         await document.move({ collectionId });
       }
 
+      posthog.capture("document_moved", {
+        destination_type: type,
+      });
       toast.success(t("Document moved"));
 
       dialogs.closeAllModals();

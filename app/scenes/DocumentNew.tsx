@@ -11,6 +11,7 @@ import PlaceholderDocument from "~/components/PlaceholderDocument";
 import useCurrentUser from "~/hooks/useCurrentUser";
 import useQuery from "~/hooks/useQuery";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { documentEditPath, documentPath } from "~/utils/routeHelpers";
 
 function DocumentNew() {
@@ -64,6 +65,12 @@ function DocumentNew() {
             .getByDocumentId(document.id)
             ?.addDocument(document, parentDocumentId);
         }
+
+        posthog.capture("document_created", {
+          has_collection: !!collection?.id,
+          has_parent_document: !!parentDocumentId,
+          from_template: !!query.get("templateId"),
+        });
 
         history.replace(
           !user.separateEditMode

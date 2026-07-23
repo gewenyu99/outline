@@ -513,6 +513,23 @@ export class Environment {
   );
 
   /**
+   * PostHog project token for frontend analytics.
+   */
+  @Public
+  @IsOptional()
+  public POSTHOG_PROJECT_TOKEN = this.toOptionalString(
+    environment.POSTHOG_PROJECT_TOKEN
+  );
+
+  /**
+   * PostHog ingestion host for frontend analytics.
+   */
+  @Public
+  @IsOptional()
+  @IsUrl()
+  public POSTHOG_HOST = this.toOptionalString(environment.POSTHOG_HOST);
+
+  /**
    * A DataDog API key for tracking server metrics.
    */
   public DD_API_KEY = environment.DD_API_KEY;

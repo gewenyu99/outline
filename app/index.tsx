@@ -28,6 +28,7 @@ import { PluginManager } from "./utils/PluginManager";
 import history from "./utils/history";
 import { initSentry } from "./utils/sentry";
 import { ActionContextProvider } from "./hooks/useActionContext";
+import "./utils/posthog";
 
 // Load plugins as soon as possible
 void PluginManager.loadPlugins();
