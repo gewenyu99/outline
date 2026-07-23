@@ -16,6 +16,7 @@ import Switch from "~/components/Switch";
 import env from "~/env";
 import usePolicy from "~/hooks/usePolicy";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { AvatarSize } from "../../Avatar";
 import CopyToClipboard from "../../CopyToClipboard";
 import NudeButton from "../../NudeButton";
@@ -73,9 +74,17 @@ function PublicAccess(
             published: true,
           });
           copy(newShare.url);
+          posthog.capture("document_public_access_changed", {
+            enabled: true,
+            created_share: true,
+          });
           toast.success(t("Public link copied to clipboard"));
         } else if (share) {
           await share.save({ published: checked });
+          posthog.capture("document_public_access_changed", {
+            enabled: checked,
+            created_share: false,
+          });
           if (checked) {
             copy(share.url);
             toast.success(t("Public link copied to clipboard"));

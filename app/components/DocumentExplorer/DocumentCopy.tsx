@@ -10,6 +10,7 @@ import Switch from "~/components/Switch";
 import Text from "~/components/Text";
 import useCollectionTrees from "~/hooks/useCollectionTrees";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { FlexContainer, Footer } from "./Components";
 import DocumentExplorer from "./DocumentExplorer";
 
@@ -56,6 +57,11 @@ function DocumentCopy({ document, onSubmit }: Props) {
         ...(path.type === "document" ? { parentDocumentId: path.id } : {}),
       });
 
+      posthog.capture("document_duplicated", {
+        published: publish,
+        includes_nested_documents: recursive,
+        destination_type: path.type,
+      });
       toast.success(t("Document copied"));
       onSubmit(result);
     } catch (_err) {

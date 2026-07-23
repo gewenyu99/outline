@@ -16,6 +16,7 @@ import Desktop from "~/utils/Desktop";
 import { deleteAllDatabases } from "~/utils/developer";
 import Logger from "~/utils/Logger";
 import isCloudHosted from "~/utils/isCloudHosted";
+import posthog from "~/utils/posthog";
 import Store from "./base/Store";
 
 type PersistedData = Pick<
@@ -223,6 +224,12 @@ export default class AuthStore extends Store<Team> {
         this.availableTeams = res.data.availableTeams;
         this.collaborationToken = res.data.collaborationToken;
 
+        posthog.identify(data.user.id, {
+          email: data.user.email,
+          name: data.user.name,
+          role: data.user.role,
+        });
+
         if (env.SENTRY_DSN) {
           const scope = Sentry.getCurrentScope();
           scope.setUser({ id: this.currentUserId! });
@@ -380,6 +387,10 @@ export default class AuthStore extends Store<Team> {
     if (clearCache) {
       // clear IndexedDB databases used for document caching
       await deleteAllDatabases();
+    }
+
+    if (this.authenticated) {
+      posthog.reset();
     }
 
     // clear all credentials from cache (and local storage via autorun)

@@ -14,6 +14,7 @@ import type Revision from "~/models/Revision";
 import type { Editor as TEditor } from "~/editor";
 import { useLocationSidebarContext } from "~/hooks/useLocationSidebarContext";
 import useStores from "~/hooks/useStores";
+import posthog from "~/utils/posthog";
 import { documentEditPath } from "~/utils/routeHelpers";
 
 const AUTOSAVE_DELAY = 3000;
@@ -166,6 +167,12 @@ export function useDocumentSave({
 
       try {
         const savedDocument = await document.save(undefined, options);
+        if (options.publish) {
+          posthog.capture("document_published", {
+            is_draft: document.isDraft,
+            has_collection: !!document.collectionId,
+          });
+        }
         setIsEditorDirty(false);
         isEditorDirtyRef.current = false;
 
